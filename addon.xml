@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.opencourse" name="网易公开课" version="0.1" provider-name="tacy.lee">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+    <import addon="script.module.beautifulsoup" version="3.0.8" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language></language>
+    <summary lang="en">Netease opencourse</summary>
+    <summary lang="zh">网易公开课</summary>
+    <description lang="en"></description>
+    <description lang="zh">视频播放地址来自网易开放课平台，如果大家觉得不错，可以去多支持，希望大家学习开心！另外，国内大学的课程都有问题，暂时没有找到好的解决办法</description>
+  </extension>
+</addon>
