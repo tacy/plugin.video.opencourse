@@ -1,11 +1,8 @@
 # -*- coding:utf-8 -*-
 from xbmcswift2 import Plugin
 from BeautifulSoup import BeautifulSoup
-import urllib2
-import re, sys
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import urllib2, re
+from ChineseKeyboard import Keyboard
 
 plugin = Plugin()
 
@@ -49,9 +46,13 @@ def catagorys(subject):
 def courseLists(url):
     if url == 'search':
         url = 'http://so.open.163.com/movie/search/searchprogram/ot0/tacy/1.html?vs='
-        kb = plugin.keyboard('','请输入搜索内容')
-        print type(kb)
-        if kb !='': url=url+kb
+        kb = Keyboard('',u'请输入搜索关键字')
+        kb.doModal()
+        if kb.isConfirmed():
+            searchStr = kb.getText()
+            searchStr2 =  unicode(searchStr, 'utf-8')
+            url = url + urllib2.quote(searchStr2.encode('gb18030'))
+        print url
     soup = _http(url)
     courseDiv = soup.find('div', {'class': 'contentArea-tabContent on'})
     courseUl = courseDiv.find('ul', {'class': 'contentArea-resultList'})
