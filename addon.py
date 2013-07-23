@@ -8,7 +8,7 @@ plugin = Plugin()
 
 def _http(url):
     """
-    open url return response
+    open url return beautifulsoup
     """
     try:
         req = urllib2.Request(url)
@@ -22,6 +22,9 @@ def _http(url):
 
 @plugin.route('/')
 def index():
+    """
+    index item
+    """
     item = [
         {'label': u"按课程分类", 'path': plugin.url_for('catagorys', subject='course')},
         {'label': u"按学校分类", 'path': plugin.url_for('catagorys', subject='school')},
@@ -31,6 +34,9 @@ def index():
 
 @plugin.route('/catagorys/<subject>')
 def catagorys(subject):
+    """
+    scratch catagory url, catagory by school or course or search
+    """
     url = 'http://so.open.163.com/movie/listpage/listprogram1/pl2/default/default/fc/ot/default/1.html'
     soup = _http(url)
     result = soup.findAll("ul",{'class': 'contentSliderArea-list cDBlue'})
@@ -44,6 +50,9 @@ def catagorys(subject):
 
 @plugin.route('/courseLists/<url>/')
 def courseLists(url):
+    """
+    scratch course list
+    """
     if url == 'search':
         url = 'http://so.open.163.com/movie/search/searchprogram/ot0/tacy/1.html?vs='
         kb = Keyboard('',u'请输入搜索关键字')
@@ -79,6 +88,7 @@ def courseLists(url):
 @plugin.route('/courseInfos/<url>')
 def courseInfos(url):
     """
+    scratch course video url
     """
     soup = _http(url)
     courseTable = soup.find('table', id='list2')
@@ -96,9 +106,9 @@ def courseInfos(url):
 @plugin.route('/playCourse/<url>')
 def playCourse(url):
     """
-
+    play video,url 301 redirect
     Arguments:
-    - `url`:
+    - `url`:course video url
     """
     resp = urllib2.urlopen(url)
     videoUrl = resp.geturl()
