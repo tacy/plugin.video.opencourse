@@ -40,7 +40,7 @@ def catagorys(subject):
     url = 'http://so.open.163.com/movie/listpage/listprogram1/pl2/default/default/fc/ot/default/1.html'
     soup = _http(url)
     result = soup.findAll("ul",{'class': 'contentSliderArea-list cDBlue'})
-    print result
+    #print result
     catagoryList = result[0].findAll('a') if subject=='course' else result[1].findAll('a')
     item = [{
         'label': menu.string,
@@ -81,8 +81,9 @@ def courseLists(url):
     rePatten = re.compile(r'href="(.*?)">(\D.*?)</a>')
     pageGroup = re.findall(rePatten, str(pageList))
     for pg in pageGroup:
-        if pg[1]==u'上一页': item.insert(0, {'label': u'上一页', 'path': plugin.url_for('courseLists', url=pg[0]),})
-        if pg[1]==u'下一页': item.append({'label': u'下一页', 'path': plugin.url_for('courseLists', url=pg[0]),})
+        tmp = unicode(pg[1], 'utf-8')
+        if tmp==u'上一页': item.insert(0, {'label': u'上一页', 'path': plugin.url_for('courseLists', url=pg[0]),})
+        if tmp==u'下一页': item.append({'label': u'下一页', 'path': plugin.url_for('courseLists', url=pg[0]),})
     return item
 
 @plugin.route('/courseInfos/<url>')
