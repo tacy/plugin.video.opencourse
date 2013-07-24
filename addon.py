@@ -94,11 +94,14 @@ def courseInfos(url):
     soup = _http(url)
     courseTable = soup.find('table', id='list2')
     item = []
-    rePatten = re.compile(r'\s+(\[.*\]?)\s+<a.*?>(.*?)</a>\s+.*\s+.*\s+.*\s+.*href="(.*?)"')
+    #print courseTable
+    rePatten = re.compile(r'\s+(\[.*\]?)\s+<a.*?>(.*?)</a>\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*href="(.*?)"')
     courseGroup = re.findall(rePatten, str(courseTable))
     for menu in courseGroup:
+        #print menu[2]
+        labstr = menu[0] + menu[1] if menu[2] != '#' else menu[0] + menu[1] + u'  (未翻译课程，无法播放)'
         item.append({
-            'label': menu[0] + menu[1],
+            'label': labstr,
             'path': plugin.url_for('playCourse', url=menu[2]),
             'is_playable': True,
         })
