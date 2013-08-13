@@ -28,6 +28,7 @@ def index():
     item = [
         {'label': u"按课程分类", 'path': plugin.url_for('catagorys', subject='course')},
         {'label': u"按学校分类", 'path': plugin.url_for('catagorys', subject='school')},
+        {'label': u"TED10", 'path': plugin.url_for('tedten', url='http://v.163.com/special/ted10collection/')},
         {'label': u"搜索", 'path': plugin.url_for('courseLists', url='search')}
         ]
     return item
@@ -70,12 +71,12 @@ def courseLists(url):
     item = []
     rePatten = re.compile(r'href="(.*?)".*?>([^<\n].*?)<', re.DOTALL)
     for tmp in courseList:
-        urlGroup = re.search(rePatten, str(tmp))
-        if urlGroup:
+        urllist = re.search(rePatten, str(tmp))
+        if urllist:
             # print urlGroup.group(1) + urlGroup.group(2)
             item.append({
-                'label': urlGroup.group(2),
-                'path': plugin.url_for('courseInfos', url=urlGroup.group(1)),
+                'label': urllist.group(2),
+                'path': plugin.url_for('courseInfos', url=urllist.group(1)),
             })
 
     rePatten = re.compile(r'href="(.*?)">(\D.*?)</a>')
@@ -86,6 +87,28 @@ def courseLists(url):
         if tmp==u'下一页': item.append({'label': u'下一页', 'path': plugin.url_for('courseLists', url=pg[0]),})
     return item
 
+@plugin.route('/ted10/<url>')
+def tedten(url):
+    """
+    ted 10 collection
+    Arguments:
+    - `url`:
+    """
+    item = []
+    soup = _http(url)
+    rePatten = re.compile(r'class="f-cb" href="(.*?)".*?f-thide">(.*?)</p>', re.DOTALL)
+    urllist = re.findall(rePatten, str(soup))
+    #print urllist
+    for aurl in urllist:
+        # print urlGroup.group(1) + urlGroup.group(2)
+        #print aurl[1]
+        item.append({
+            'label': aurl[1],
+            'path': plugin.url_for('playTED', url=aurl[0]),
+            'is_playable': True,
+        })
+    return item
+
 @plugin.route('/courseInfos/<url>')
 def courseInfos(url):
     """
@@ -94,11 +117,12 @@ def courseInfos(url):
     soup = _http(url)
     courseTable = soup.find('table', id='list2')
     item = []
-    #print courseTable
-    rePatten = re.compile(r'\s+(\[.*\]?)\s+<a.*?>(.*?)</a>\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*href="(.*?)"')
+    print courseTable
+    #rePatten = re.compile(r'\s+(\[.*\]?)\s+<a.*?>(.*?)</a>\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*href="(.*?)"')
+    rePatten = re.compile(r'(\[.*?\]).*?>(.*?)</a>.*?downbtn" href="(.*?.mp4)', re.DOTALL)
     courseGroup = re.findall(rePatten, str(courseTable))
     for menu in courseGroup:
-        #print menu[2]
+        print menu[2]
         labstr = menu[0] + menu[1] if menu[2] != '#' else menu[0] + menu[1] + u'  (未翻译课程，无法播放)'
         item.append({
             'label': labstr,
@@ -118,6 +142,24 @@ def playCourse(url):
     videoUrl = resp.geturl()
     print '+++++++++++++++++++++++' + videoUrl
     plugin.set_resolved_url(videoUrl)
+
+@plugin.route('/playTED/<url>')
+def playTED(url):
+    """
+    ted course play
+    Arguments:
+    - `url`:
+    """
+    match = re.search(r'/([\w]+/[\w]+)/(\w+).html', url)
+    url2 = 'http://live.ws.126.net/movie/' + match.group(1) + '/2_' + match.group(2) + '.xml'
+    #print '++++++++++++++++++++', url2
+    resp = urllib2.urlopen(url2)
+    match2 = re.search(r'playurl_origin.*(http://.*shd.mp4).*?(http://.*?\.srt)', resp.read())
+    #print '+++++++++++++++++++++++', match2.group(1), match2.group(2)
+    resp2 = urllib2.urlopen(match2.group(1))
+    videourl = resp2.geturl()
+    print 'videourl+++++++++++++++++++++++', videourl
+    plugin.set_resolved_url(videourl,match2.group(2))
 
 if __name__ == '__main__':
     plugin.run()
